@@ -75,8 +75,6 @@ const message = {
 
 ;(async () => {
   testYTB()
-  testDazn()
-  testParam()
   let [{ region, status }] = await Promise.all([testDisneyPlus(),testNf(FILM_ID),testDiscovery()])
   console.log(result["Netflix"])
   console.log(`testDisneyPlus: region=${region}, status=${status}`)
@@ -94,7 +92,7 @@ const message = {
     result["Disney"] = "<b>Disneyᐩ:</b> 检测超时 🚦 "
   }
 
-  let content = "------------------------------"+"</br>"+([result["YouTube"],result["Netflix"],result["Disney"],result["Dazn"],result["Paramount"],result["Discovery"]]).join("</br></br>")
+  let content = "------------------------------"+"</br>"+([result["YouTube"],result["Netflix"],result["Disney"]]).join("</br></br>")
   content = content + "</br>------------------------------</br>"+"<font color=#CD5C5C >"+"<b>节点</b> ➟ " + $environment.params+ "</font>"
   content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
 //  cnt = `<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` +'----------------------</br></br>'+result["Disney"]+'</br></br>----------------------</br>'+$environment.params + `</p>`
@@ -105,7 +103,7 @@ $configuration.sendMessage(message).then(resolve => {
     }
     if (resolve.ret) {
       let output=JSON.stringify(resolve.ret[message.content])? JSON.stringify(resolve.ret[message.content]).replace(/\"|\[|\]/g,"").replace(/\,/g," ➟ ") : $environment.params
-      let content = "--------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["YouTube"]]).join("</br></br>")
+      let content = "--------------------------------------</br>"+([result["Disney"],result["Netflix"],result["YouTube"]]).join("</br></br>")
       content = content + "</br>--------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + output+ "</font>"
       content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
       //$notify(typeof(output),output)
@@ -129,7 +127,7 @@ $configuration.sendMessage(message).then(resolve => {
     }
     if (resolve.ret) {
       let output=JSON.stringify(resolve.ret[message.content])? JSON.stringify(resolve.ret[message.content]).replace(/\"|\[|\]/g,"").replace(/\,/g," ➟ ") : $environment.params
-      let content = "--------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["YouTube"]]).join("</br></br>")
+      let content = "--------------------------------------</br>"+([result["Disney"],result["Netflix"],result["YouTube"]]).join("</br></br>")
       content = content + "</br>--------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + output+ "</font>"
       content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
       //$notify(typeof(output),output)
@@ -376,140 +374,3 @@ function testYTB() {
       //resolve("timeout")
     })
 }
-
-function testDazn() { 
-  
-  const extra =`{
-    "LandingPageKey":"generic",
-    "Platform":"web",
-    "PlatformAttributes":{},
-    "Manufacturer":"",
-    "PromoCode":"",
-    "Version":"2"
-  }`
-  let option = {
-    url: BASE_URL_Dazn,
-    method: "POST",
-    opts: opts,
-    timeout: 2800,
-    headers: {
-      'User-Agent':
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-      "Content-Type": "application/json"
-    },
-    body: extra
-  }
-
-  $task.fetch(option).then(response=> {
-    let data = response.body
-    //data = extra
-    let header = JSON.stringify(response.headers)
-    console.log("Dazn:"+response.statusCode)
-    //console.log("Dazn:"+data)
-    //$done(data)
-    if (response.statusCode !== 200) {
-      //reject('Error')
-      result["Dazn"] = "<b>Dazn: </b>检测失败 ❗️"
-    } else if (response.statusCode == 200) {//console.log(data.split("countryCode")[1])
-      //console.log(data)
-      let region = ''
-      let re = new RegExp('"GeolocatedCountry":"(.*?)"', 'gm')
-      let ret = re.exec(data)
-      if (ret != null && ret.length === 2) {
-        region = ret[1]
-        result["Dazn"] = "<b>Dazn: </b>支持 "+arrow+ "⟦"+flags.get(region.toUpperCase())+"⟧ 🎉"
-      } else {
-        result["Dazn"] = "<b>Dazn: </b>未支持 🚫"
-
-      }
-      //resolve(region)
-            console.log("Dazn:"+region+ result["Dazn"])
-    }
-  }, reason => {
-    result["Dazn"] = "<b>Dazn: </b>检测超时 🚦"
-    //resolve("timeout")
-  })
-}
-
-function testParam() { 
-  let option = {
-    url: BASE_URL_Param,
-    opts: opts1,
-    timeout: 2800,
-    headers: {
-      'User-Agent':
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'
-    },
-  }
-  $task.fetch(option).then(response=> {
-    //let data = response.body
-    console.log("Paramountᐩ:"+response.statusCode)
-    if (response.statusCode == 200) {
-      //reject('Error')
-      result["Paramount"] = "<b>Paramountᐩ: </b>支持 🎉 "
-    } else if (response.statusCode == 302) {
-      //resolve('Not Available')
-      result["Paramount"] = "<b>Paramountᐩ: </b>未支持 🚫"
-    } 
-      console.log("Paramountᐩ:"+ result["Paramount"])
-  }, reason => {
-    result["Paramount"] = "<b>Paramountᐩ: </b>检测超时 🚦"
-    //resolve("timeout")
-  })
-}
-
-
-
-function testDiscovery() {
-  return new Promise((resolve, reject) =>{
-    let option = {
-      url: BASE_URL_Discovery_token,
-      opts: opts1,
-      timeout: 2800,
-      headers: {
-        'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36'
-      },
-      verify: false
-    }
-    $task.fetch(option).then(response=> {
-      console.log("GetToken:"+response.statusCode)
-      let data = JSON.parse(response.body)
-      let token = data["data"]["attributes"]["token"]
-      const cookievalid =`_gcl_au=1.1.858579665.1632206782; _rdt_uuid=1632206782474.6a9ad4f2-8ef7-4a49-9d60-e071bce45e88; _scid=d154b864-8b7e-4f46-90e0-8b56cff67d05; _pin_unauth=dWlkPU1qWTRNR1ZoTlRBdE1tSXdNaTAwTW1Nd0xUbGxORFV0WWpZMU0yVXdPV1l6WldFeQ; _sctr=1|1632153600000; aam_fw=aam%3D9354365%3Baam%3D9040990; aam_uuid=24382050115125439381416006538140778858; st=${token}; gi_ls=0; _uetvid=a25161a01aa711ec92d47775379d5e4d; AMCV_BC501253513148ED0A490D45%40AdobeOrg=-1124106680%7CMCIDTS%7C18894%7CMCMID%7C24223296309793747161435877577673078228%7CMCAAMLH-1633011393%7C9%7CMCAAMB-1633011393%7CRKhpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y%7CMCOPTOUT-1632413793s%7CNONE%7CvVersion%7C5.2.0; ass=19ef15da-95d6-4b1d-8fa2-e9e099c9cc38.1632408400.1632406594`
-      let option1 = {
-        url: BASE_URL_Discovery,
-        opts: opts1,
-        timeout: 2800,
-        headers: {
-          'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-          "Cookie": cookievalid,
-        },
-        ciphers: "DEFAULT@SECLEVEL=1",
-        verify: false
-      }
-      $task.fetch(option1).then(response=> {
-        console.log("Check:"+response.statusCode)
-        let data = JSON.parse(response.body)
-        let locationd = data["data"]["attributes"]["currentLocationTerritory"]
-        if (locationd == "us") {
-          result["Discovery"] = "<b>Discoveryᐩ: </b>支持 🎉 "
-          console.log("支持Discoveryᐩ")
-          resolve("支持Discoveryᐩ")
-          return
-        } else {
-          result["Discovery"] = "<b>Discoveryᐩ: </b>未支持 🚫"
-          console.log("不支持Discoveryᐩ")
-          resolve("不支持Discoveryᐩ")
-          return
-        }
-      }, reason => {
-        console.log("Check-Error"+reason)
-        resolve("discovery failed")
-      })
-    }, reason => {
-      console.log("GetToken-Error"+reason)
-      resolve("discovery failed")
-    })})}
-
